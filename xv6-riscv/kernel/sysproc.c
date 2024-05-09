@@ -118,14 +118,15 @@ sys_uptime(void)
   return xticks;
 }
 
-int
+uint64
 sys_strace(void){
     int n;
 
     argint(0, &n);
     if(n < 0)
         return -1;
-    if (n==0 || n==1)
-        myproc()->trace=n;
+    if (n!=0 && n!=1)
+        return -1;
+    myproc()->trace=n;
     return 0;
 }
