@@ -101,7 +101,7 @@ sys_write(void)
   argint(2, &n);
   rv = argfd(0, &fd, &f);
   if (mp->trace)
-    printf("[%d] sys_write(%d)\n", myproc()->pid, fd);
+    printf("[%d] sys_write(%d, addr, %d)\n", myproc()->pid, fd, n);
   if(rv < 0)
     return -1;
 
