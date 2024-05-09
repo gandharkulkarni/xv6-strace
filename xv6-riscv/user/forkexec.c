@@ -1,6 +1,6 @@
 #include "kernel/types.h"
 #include "user/user.h"
-int main(void)
+int main(int argc,  char *args[])
 {
     int pid = fork();
     if (pid < 0)
@@ -11,7 +11,7 @@ int main(void)
     if (pid == 0)
     {
         // Child process
-        char *args[] = {"echo", "Hello, World!", 0};
+        // char *args[] = {"echo", "Hello, World!", 0};
         exec("echo", args);
         printf("exec failed\n"); // exec only returns if there is an err exit (1);
     }
