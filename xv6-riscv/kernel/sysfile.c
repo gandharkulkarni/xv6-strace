@@ -60,7 +60,7 @@ sys_dup(void)
   rv = argfd(0, &fd, &f);
   struct proc *mp = myproc();
   if (mp->trace)
-    printf("[%d] argfd(%d)\n", myproc()->pid, fd);
+    printf("[%d] sys_dup(%d)\n", myproc()->pid, fd);
   if( rv < 0)
     return -1;
   if((fd=fdalloc(f)) < 0)
@@ -82,7 +82,7 @@ sys_read(void)
   rv = argfd(0, &fd, &f);
   struct proc *mp = myproc();
   if (mp->trace)
-    printf("[%d] sys_close(%d)\n", myproc()->pid, fd);
+    printf("[%d] sys_read(%d, addr, %d)\n", myproc()->pid, fd, n);
   if(rv < 0)
     return -1;
   return fileread(f, p, n);
@@ -129,10 +129,16 @@ uint64
 sys_fstat(void)
 {
   struct file *f;
+  int fd;
   uint64 st; // user pointer to struct stat
-
   argaddr(1, &st);
-  if(argfd(0, 0, &f) < 0)
+  int rv  = argfd(0, &fd, &f);
+  struct proc *mp = myproc();
+  if (mp->trace)
+    printf("[%d] sys_fstat(%d)\n", myproc()->pid, fd);
+
+  
+  if( rv < 0)
     return -1;
   return filestat(f, st);
 }
@@ -450,7 +456,7 @@ sys_mknod(void)
 
   struct proc *mp = myproc();
   if (mp->trace)
-    printf("[%d] sys_mknod(%s, %d, %d)\n", myproc()->pid, path, minor, major);
+    printf("[%d] sys_mknod(%s, %d, %d)\n", myproc()->pid, path, major, minor);
 
   if( rv < 0 ||
      (ip = create(path, T_DEVICE, major, minor)) == 0){
