@@ -10,7 +10,10 @@ uint64
 sys_exit(void)
 {
   int n;
+  struct proc *mp = myproc();
   argint(0, &n);
+  if(mp->trace)
+    printf("[%d] exit(%d)\n",mp->pid, n);
   exit(n);
   return 0;  // not reached
 }
@@ -18,12 +21,18 @@ sys_exit(void)
 uint64
 sys_getpid(void)
 {
+  struct proc *mp = myproc();
+  if(mp->trace)
+    printf("[%d] getpid()\n",mp->pid);
   return myproc()->pid;
 }
 
 uint64
 sys_fork(void)
 {
+  struct proc *mp = myproc();
+  if(mp->trace)
+    printf("[%d] fork()\n",mp->pid);
   return fork();
 }
 
@@ -31,7 +40,12 @@ uint64
 sys_wait(void)
 {
   uint64 p;
+  struct proc *mp = myproc();
+
   argaddr(0, &p);
+  if(mp->trace)
+    printf("[%d] wait(addr)\n",mp->pid);
+
   return wait(p);
 }
 
@@ -40,9 +54,14 @@ sys_sbrk(void)
 {
   uint64 addr;
   int n;
+  struct proc *mp = myproc();
 
   argint(0, &n);
   addr = myproc()->sz;
+
+  if(mp->trace)
+    printf("[%d] sbrk(%d)\n",mp->pid, n);
+
   if(growproc(n) < 0)
     return -1;
   return addr;
@@ -53,10 +72,13 @@ sys_sleep(void)
 {
   int n;
   uint ticks0;
+  struct proc *mp = myproc();
 
   argint(0, &n);
   acquire(&tickslock);
   ticks0 = ticks;
+  if(mp->trace)
+    printf("[%d] sleep(%d)\n",mp->pid, n);
   while(ticks - ticks0 < n){
     if(killed(myproc())){
       release(&tickslock);
@@ -72,8 +94,11 @@ uint64
 sys_kill(void)
 {
   int pid;
+  struct proc *mp = myproc();
 
   argint(0, &pid);
+  if(mp->trace)
+    printf("[%d] kill(%d)\n",mp->pid, pid);
   return kill(pid);
 }
 
@@ -83,9 +108,24 @@ uint64
 sys_uptime(void)
 {
   uint xticks;
+  struct proc *mp = myproc();
+  if(mp->trace)
+    printf("[%d] uptime()\n",mp->pid);
 
   acquire(&tickslock);
   xticks = ticks;
   release(&tickslock);
   return xticks;
+}
+
+int
+sys_strace(void){
+    int n;
+
+    argint(0, &n);
+    if(n < 0)
+        return -1;
+    if (n==0 || n==1)
+        myproc()->trace=n;
+    return 0;
 }
