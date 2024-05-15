@@ -44,7 +44,7 @@ sys_wait(void)
 
   argaddr(0, &p);
   if(mp->trace)
-    printf("[%d] wait(addr)\n",mp->pid);
+    printf("[%d] wait(%p)\n",mp->pid, p);
 
   return wait(p);
 }

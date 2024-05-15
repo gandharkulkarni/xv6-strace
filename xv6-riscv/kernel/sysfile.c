@@ -82,7 +82,7 @@ sys_read(void)
   rv = argfd(0, &fd, &f);
   struct proc *mp = myproc();
   if (mp->trace)
-    printf("[%d] sys_read(%d, addr, %d)\n", myproc()->pid, fd, n);
+    printf("[%d] sys_read(%d, %p, %d)\n", myproc()->pid, fd, p, n);
   if(rv < 0)
     return -1;
   return fileread(f, p, n);
@@ -101,7 +101,7 @@ sys_write(void)
   argint(2, &n);
   rv = argfd(0, &fd, &f);
   if (mp->trace)
-    printf("[%d] sys_write(%d, addr, %d)\n", myproc()->pid, fd, n);
+    printf("[%d] sys_write(%d, %p, %d)\n", myproc()->pid, fd, p, n);
   if(rv < 0)
     return -1;
 
@@ -512,7 +512,7 @@ sys_exec(void)
 
   struct proc *mp = myproc();
   if (mp->trace)
-    printf("[%d] sys_exec(%s)\n", myproc()->pid, path);
+    printf("[%d] sys_exec(%s, %p)\n", myproc()->pid, path, uargv);
 
   if( rv < 0) {
     return -1;
@@ -558,10 +558,11 @@ sys_pipe(void)
   struct proc *p = myproc();
 
   struct proc *mp = myproc();
-  if (mp->trace)
-    printf("[%d] sys_pipe(addr)\n", myproc()->pid);
-
   argaddr(0, &fdarray);
+  if (mp->trace)
+    printf("[%d] sys_pipe(%p)\n", myproc()->pid, fdarray);
+
+  
   if(pipealloc(&rf, &wf) < 0)
     return -1;
   fd0 = -1;
